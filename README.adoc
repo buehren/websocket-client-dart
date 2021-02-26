@@ -1,7 +1,8 @@
 = WebSocket Client in Dart
 
-This simple WebSocket client connects to a given WebSocket URL and sends three texts with a delay of a few seconds. Received data is printed.
+This simple WebSocket client connects to a given WebSocket URL and sends three texts with a delay of a few seconds. Received data is printed. (Requires https://dart.dev/get-dart[Dart].)
 
+== Client
 [source%nowrap,bash]
 ----
 > dart pub get
@@ -10,7 +11,9 @@ This simple WebSocket client connects to a given WebSocket URL and sends three t
 > dart run wsclient.dart
 ----
 
-Now try https://github.com/buehren/websocket-echo-server-quarkus[WebSocket echo server].
+== Quarkus Server
+
+Now try https://github.com/buehren/websocket-echo-server-quarkus[WebSocket echo server in Quarkus (Java)].
 
 The Dart client works with WebSocket echo server running on localhost:
 [source%nowrap,bash]
@@ -46,15 +49,66 @@ closeReason=
 2021-02-26 21:25:44.848959 Sending 'still there?'
 ----
 
-But this client works with WebSocket echo server running on Google Cloud Run:
+But this Python client works with WebSocket echo server running on Google Cloud Run:
 [source%nowrap,bash]
 ----
-> wsdump.py wss://websocket-echo-server-quarkus-xxxxxxxxxx-xx.x.run.app/websocket
+> python3 wsdump.py wss://websocket-echo-server-quarkus-xxxxxxxxxx-xx.x.run.app/websocket
 
 Press Ctrl+C to quit
 > The quick brown fox
 < echo of The quick brown fox
 > jumps over the lazy cat.
 < echo of jumps over the lazy cat.
+>
+----
+
+== Python Server
+
+Now try https://github.com/buehren/websocket-echo-server-python[WebSocket echo server in Python].
+
+The Dart client works with WebSocket echo server running on localhost:
+[source%nowrap,bash]
+----
+> dart run wsclient.dart --url ws://localhost:8080/websocket
+
+2021-02-26 22:43:12.531323 Starting connection attempt to ws://localhost:8080/websocket ...
+2021-02-26 22:43:12.673670 WebSocket readyState: 1
+2021-02-26 22:43:13.697287 Sending 'hello'
+2021-02-26 22:43:13.712441 Received data: hello
+2021-02-26 22:43:14.676114 Sending 'how are you?'
+2021-02-26 22:43:14.678580 Received data: how are you
+2021-02-26 22:43:16.676518 Sending 'still there?'
+2021-02-26 22:43:16.678663 Received data: still there?
+^C
+
+----
+
+The Dart client does NOT work with WebSocket echo server running on Google Cloud Run -- the WebSocket is closed right after the Dart client sends data:
+[source%nowrap,bash]
+----
+> dart run wsclient.dart --url wss://websocket-echo-server-python-xxxxxxxxxx-xx.x.run.app/websocket
+
+2021-02-26 22:43:52.298434 Starting connection attempt to wss://websocket-echo-server-python-xxxxxxxxxx-xx.x.run.app/websocket ...
+2021-02-26 22:43:52.619030 WebSocket readyState: 1
+2021-02-26 22:43:53.623518 Sending 'hello'
+2021-02-26 22:43:53.683049 CONNECTION DONE!
+readyState=3
+closeCode=1005
+closeReason=
+
+2021-02-26 22:43:54.621043 Sending 'how are you?'
+2021-02-26 22:43:56.621170 Sending 'still there?'
+----
+
+But this Python client works with WebSocket echo server running on Google Cloud Run:
+[source%nowrap,bash]
+----
+> python3 wsdump.py wss://websocket-echo-server-python-xxxxxxxxxx-xx.x.run.app/websocket
+
+Press Ctrl+C to quit
+> The quick brown fox
+< The quick brown fox
+> jumps over the lazy cat.
+< jumps over the lazy cat.
 >
 ----
