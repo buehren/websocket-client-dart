@@ -1,0 +1,60 @@
+= WebSocket Client in Dart
+
+This simple WebSocket client connects to a given WebSocket URL and sends three texts with a delay of a few seconds. Received data is printed.
+
+[source%nowrap,bash]
+----
+> dart pub get
+
+# echo.websocket.org is used by default:
+> dart run wsclient.dart
+----
+
+Now try https://github.com/buehren/websocket-echo-server-quarkus[WebSocket echo server].
+
+The Dart client works with WebSocket echo server running on localhost:
+[source%nowrap,bash]
+----
+> dart run wsclient.dart --url ws://localhost:8080/websocket
+
+2021-02-26 21:25:22.293451 Starting connection attempt to ws://localhost:8080/websocket ...
+2021-02-26 21:25:22.418794 WebSocket readyState: 1
+2021-02-26 21:25:23.446877 Sending 'hello'
+2021-02-26 21:25:23.458083 Received data: echo of hello
+2021-02-26 21:25:24.422013 Sending 'how are you?'
+2021-02-26 21:25:24.422752 Received data: echo of how are you
+2021-02-26 21:25:26.433450 Sending 'still there?'
+2021-02-26 21:25:26.436280 Received data: echo of still there?
+^C
+^C
+----
+
+The Dart client does NOT work with WebSocket echo server running on Google Cloud Run -- the WebSocket is closed right after the Dart client sends data:
+[source%nowrap,bash]
+----
+> dart run wsclient.dart --url wss://websocket-echo-server-quarkus-xxxxxxxxxx-xx.x.run.app/websocket
+
+2021-02-26 21:25:40.539316 Starting connection attempt to wss://websocket-echo-server-quarkus-xxxxxxxxxx-xx.x.run.app/websocket ...
+2021-02-26 21:25:40.844298 WebSocket readyState: 1
+2021-02-26 21:25:41.851590 Sending 'hello'
+2021-02-26 21:25:41.898587 CONNECTION DONE!
+readyState=3
+closeCode=1005
+closeReason=
+
+2021-02-26 21:25:42.847345 Sending 'how are you?'
+2021-02-26 21:25:44.848959 Sending 'still there?'
+----
+
+But this client works with WebSocket echo server running on Google Cloud Run:
+[source%nowrap,bash]
+----
+> wsdump.py wss://websocket-echo-server-quarkus-xxxxxxxxxx-xx.x.run.app/websocket
+
+Press Ctrl+C to quit
+> The quick brown fox
+< echo of The quick brown fox
+> jumps over the lazy cat.
+< echo of jumps over the lazy cat.
+>
+----
