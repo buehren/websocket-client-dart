@@ -1,4 +1,6 @@
 = WebSocket Client in Dart
+:toc:
+:toclevels: 10
 
 This simple WebSocket client connects to a given WebSocket URL and sends three texts with a delay of a few seconds. Received data is printed. (Requires https://dart.dev/get-dart[Dart].)
 
@@ -112,3 +114,70 @@ Press Ctrl+C to quit
 < jumps over the lazy cat.
 >
 ----
+
+
+== Issue: WebSocket fails with Server on Google Cloud Run + Dart client
+
+Posted in https://issuetracker.google.com/issues?q=componentid:608076[Google Cloud Run Bug Tracker]:
+
+* https://issuetracker.google.com/181325975[WebSocket fails with Dart client]
+
+
+Posted in https://github.com/dart-lang/sdk/issues[Dart Bug Tracker]:
+
+* https://github.com/dart-lang/sdk/issues/45139[WebSocket fails with server on Google Cloud Run]
+
+
+=== Problem you have encountered
+
+We are currently evaluating Google Cloud Run and Flutter. The project requires a WebSocket connection from a Flutter App to a server container running in Google Cloud Run.
+
+But the combination of a Dart client + Cloud Run seems to be incompatible regarding WebSockets:
+
+* The WebSocket connection is established, and the Flutter/Dart client receives messages sent by the server on Cloud Run.
+* *As soon as the Dart client sends a message to the server, the connection is dropped.*
+
+It happens with both a Java/Quarkus and a Python server in Cloud Run. \
+It does not happen with those servers on localhost in Docker.
+
+It happens both in a Flutter App running on an Android device and in a Dart program executed from the command line. \
+It does not happen with a Python client connecting the same servers.
+
+So the only combination that fails is the one that we need: Dart + Cloud Run.
+
+=== What you expected to happen
+
+I expect the WebSocket connection to remain intact if the Dart client sends messages over it.
+
+=== Steps to reproduce
+
+I have created a complete bug reproducer with clients in Dart and Python and servers in Java and Python:
+
+* *Dart client* (the README contains the outputs of the messages sent and received and the aborted connection): +
+https://github.com/buehren/websocket-client-dart
+
+* *Java/Quarkus WebSocket Echo Server* (including a "Run in Google Cloud" button): +
+https://github.com/buehren/websocket-echo-server-quarkus
+
+* *Python WebSocket Echo Server* (including a "Run in Google Cloud" button): +
+https://github.com/buehren/websocket-echo-server-python
+
+*Other information (workarounds you have tried, documentation consulted, etc):*
+
+I could not find helpful information in the logs of Google Cloud Run.
+
+I could not find any hint by debugging the Dart client.
+
+
+=== Versions, OSs
+
+* Dart SDK Version (dart --version) +
+*Dart SDK version: 2.10.5 (stable) (Unknown timestamp) on "linux_x64"* +
+*Dart SDK version: 2.10.5 (stable) (Tue Jan 19 13:05:37 2021 +0100) on "linux_x64"* +
+*Dart SDK version: 2.12.0-259.12.beta (beta) (Fri Feb 12 11:00:34 2021 +0100) on "windows_x64"*
+
+* Whether you are using Windows, MacOSX, or Linux (if applicable) +
+*Windows, Linux, Android*
+
+* Whether you are using Chrome, Safari, Firefox, Edge (if applicable) +
+*not applicable*
