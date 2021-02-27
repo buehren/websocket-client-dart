@@ -181,3 +181,39 @@ I could not find any hint by debugging the Dart client.
 
 * Whether you are using Chrome, Safari, Firefox, Edge (if applicable) +
 *not applicable*
+
+== Question
+
+*https://stackoverflow.com/questions/66394403/websocket-connection-from-dart-flutter-to-google-cloud-run-fails[Question] posted on StackOverflow:*
+
+
+did anyone use WebSocket connections between a _Flutter/Dart client_ and a server running on _Google Cloud Run_ successfully?
+
+Exactly this combination fails for me.
+
+The client works with the same server on localhost. +
+Another client works with the same server on Cloud Run.
+
+I tried to find the cause of the problem, so I have created a complete bug reproducer with clients in Dart and Python and servers in Java and Python:
+
+* *Dart client* (the README contains the outputs of the messages sent and received and the aborted connection): +
+https://github.com/buehren/websocket-client-dart
+
+* *Java/Quarkus WebSocket Echo Server* (including a "Run in Google Cloud" button): +
+https://github.com/buehren/websocket-echo-server-quarkus
+
+* *Python WebSocket Echo Server* (including a "Run in Google Cloud" button): +
+https://github.com/buehren/websocket-echo-server-python
+
+Do you have any idea how this can happen? Did I do anything wrong in my code?
+
+Thank you very much
+
+Thomas
+
+Tags:
+`google-cloud-platform`
+`google-cloud-run`
+`dart`
+`dart-io`
+`flutter`
