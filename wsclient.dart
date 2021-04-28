@@ -33,17 +33,17 @@ void run(String webSocketUrl) async {
 
     // send messages
 
-    new Timer(const Duration(seconds: 1), () {
+    new Timer(const Duration(seconds: 2), () {
       print(new DateTime.now().toString() + " Sending 'hello'");
       _webSocket.add('hello');
     });
 
-    new Timer(const Duration(seconds: 2), () {
+    new Timer(const Duration(seconds: 4), () {
       print(new DateTime.now().toString() + " Sending 'how are you?'");
       _webSocket.add('how are you');
     });
 
-    new Timer(const Duration(seconds: 4), () {
+    new Timer(const Duration(seconds: 6), () {
       print(new DateTime.now().toString() + " Sending 'still there?'");
       _webSocket.add('still there?');
     });
