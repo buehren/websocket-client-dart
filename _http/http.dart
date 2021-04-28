@@ -2,7 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-library dart._http;
+library _myhttp;
+//library dart._http;
 
 import 'dart:async';
 import 'dart:collection'
@@ -16,8 +17,8 @@ import 'dart:collection'
         UnmodifiableMapView;
 import 'dart:convert';
 import 'dart:developer' hide log;
-import 'dart:_internal'
-    show Since, valueOfNonNullableParamWithDefault, HttpStatus;
+// import 'dart:_internal'
+//     show Since, valueOfNonNullableParamWithDefault, HttpStatus;
 import 'dart:isolate' show Isolate;
 import 'dart:math';
 import 'dart:io';
@@ -698,7 +699,7 @@ abstract class HttpHeaders {
    * the last [set] or [add] call for that header.
    */
   void add(String name, Object value,
-      {@Since("2.8") bool preserveHeaderCase = false});
+      {/*@Since("2.8")*/ bool preserveHeaderCase = false});
 
   /**
    * Sets the header [name] to [value].
@@ -707,7 +708,7 @@ abstract class HttpHeaders {
    * then [add]s [value] to it.
    */
   void set(String name, Object value,
-      {@Since("2.8") bool preserveHeaderCase = false});
+      {/*@Since("2.8")*/ bool preserveHeaderCase = false});
 
   /**
    * Removes a specific value for a header name.
@@ -1475,7 +1476,7 @@ abstract class HttpClient {
   ///
   /// Default is `false`.
   static set enableTimelineLogging(bool value) {
-    final enabled = valueOfNonNullableParamWithDefault<bool>(value, false);
+    final enabled = true; //valueOfNonNullableParamWithDefault<bool>(value, false);
     if (enabled != _enableTimelineLogging) {
       postEvent('HttpTimelineLoggingStateChange', {
         'isolateId': Service.getIsolateID(Isolate.current),
@@ -2050,7 +2051,7 @@ abstract class HttpClientRequest implements IOSink {
   ///   // If abort() called before response is available, onError will fire.
   /// });
   /// ```
-  @Since("2.10")
+  /*@Since("2.10")*/
   void abort([Object? exception, StackTrace? stackTrace]);
 }
 
@@ -2103,7 +2104,7 @@ abstract class HttpClientResponse implements Stream<List<int>> {
   /// This specifies whether the response bytes were compressed when they were
   /// received across the wire and whether callers will receive compressed
   /// or uncompressed bytes when they listed to this response's byte stream.
-  @Since("2.4")
+  /*@Since("2.4")*/
   HttpClientResponseCompressionState get compressionState;
 
   /**
@@ -2195,7 +2196,7 @@ abstract class HttpClientResponse implements Stream<List<int>> {
 ///  * Does the caller need to manually decompress the response's byte stream?
 ///
 /// This enum is accessed via the [HttpClientResponse.compressionState] value.
-@Since("2.4")
+/*@Since("2.4")*/
 enum HttpClientResponseCompressionState {
   /// The body of the HTTP response was received and remains in an uncompressed
   /// state.

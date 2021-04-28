@@ -2,7 +2,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of dart._http;
+part of _myhttp;
+//part of dart._http;
 
 const String _webSocketGUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 const String _clientNoContextTakeover = "client_no_context_takeover";
@@ -1023,6 +1024,7 @@ class _WebSocketImpl extends Stream with _ServiceObject implements WebSocket {
         query: uri.query,
         fragment: uri.fragment);
     return _httpClient.openUrl("GET", uri).then((request) {
+
       if (uri.userInfo != null && !uri.userInfo.isEmpty) {
         // If the URL contains user information use that for basic
         // authorization.
