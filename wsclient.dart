@@ -5,7 +5,19 @@ import 'package:args/args.dart';
 late MyWebSocket _webSocket;
 const urlParamName = 'url';
 
+
+// Accept all certificates (useful for debugging HTTPS payload with mitmproxy or similar)
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true; // add your localhost detection logic here if you want
+  }
+}
+
 void main(List<String> arguments) {
+  HttpOverrides.global = new MyHttpOverrides();
   String _webSocketUrl = 'ws://echo.websocket.org/';
 
   exitCode = 0; // presume success
