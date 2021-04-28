@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:args/args.dart';
+import '_myhttp/http.dart';
 
 late MyWebSocket _webSocket;
 const urlParamName = 'url';
@@ -33,9 +34,9 @@ void run(String webSocketUrl) async {
 
   print(new DateTime.now().toString() + " Starting connection attempt to " +webSocketUrl + " ...");
 
-  Future<WebSocket> futureWebSocket = WebSocket.connect(webSocketUrl);
+  Future<MyWebSocket> futureWebSocket = MyWebSocket.connect(webSocketUrl, /*headers: { "content-length": nullptr }*/ /*,  compression: CompressionOptions.compressionOff*/);
 
-  futureWebSocket.then((WebSocket ws) {
+  futureWebSocket.then((MyWebSocket ws) {
     _webSocket = ws;
     print(new DateTime.now().toString() + " WebSocket readyState: " + (_webSocket.readyState.toString()));
 
