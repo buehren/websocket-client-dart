@@ -142,13 +142,13 @@ class CompressionOptions {
       } else {
         int mwb = serverMaxWindowBits ??
             int.tryParse(part) ??
-            _WebSocketImpl.DEFAULT_WINDOW_BITS;
+            _MyWebSocketImpl.DEFAULT_WINDOW_BITS;
         info.headerValue = "; server_max_window_bits=${mwb}";
         info.maxWindowBits = mwb;
       }
     } else {
       info.headerValue = "";
-      info.maxWindowBits = _WebSocketImpl.DEFAULT_WINDOW_BITS;
+      info.maxWindowBits = _MyWebSocketImpl.DEFAULT_WINDOW_BITS;
     }
     return info;
   }
@@ -191,7 +191,7 @@ class CompressionOptions {
       return info;
     }
 
-    info.headerValue = _WebSocketImpl.PER_MESSAGE_DEFLATE;
+    info.headerValue = _MyWebSocketImpl.PER_MESSAGE_DEFLATE;
 
     if (clientNoContextTakeover &&
         (requested == null ||
@@ -247,7 +247,7 @@ class CompressionOptions {
  * This transformer strives to implement WebSockets as specified by RFC6455.
  */
 abstract class WebSocketTransformer
-    implements StreamTransformer<HttpRequest, WebSocket> {
+    implements StreamTransformer<HttpRequest, MyWebSocket> {
   /**
    * Create a new [WebSocketTransformer].
    *
@@ -284,7 +284,7 @@ abstract class WebSocketTransformer
    * to negotiate with the specified [CompressionOptions]. If none is specified
    * then the [WebSocket] will be created with the default [CompressionOptions].
    */
-  static Future<WebSocket> upgrade(HttpRequest request,
+  static Future<MyWebSocket> upgrade(HttpRequest request,
       {protocolSelector(List<String> protocols)?,
       CompressionOptions compression = CompressionOptions.compressionDefault}) {
     return _WebSocketTransformerImpl._upgrade(
@@ -305,7 +305,7 @@ abstract class WebSocketTransformer
  * The stream exposes the messages received. A text message will be of type
  * `String` and a binary message will be of type `List<int>`.
  */
-abstract class WebSocket
+abstract class MyWebSocket
     implements
         Stream<dynamic /*String|List<int>*/ >,
         StreamSink<dynamic /*String|List<int>*/ > {
@@ -372,16 +372,16 @@ abstract class WebSocket
    * If the `url` contains user information this will be passed as basic
    * authentication when setting up the connection.
    */
-  static Future<WebSocket> connect(String url,
+  static Future<MyWebSocket> connect(String url,
           {Iterable<String>? protocols,
           Map<String, dynamic>? headers,
           CompressionOptions compression =
               CompressionOptions.compressionDefault}) =>
-      _WebSocketImpl.connect(url, protocols, headers, compression: compression);
+      _MyWebSocketImpl.connect(url, protocols, headers, compression: compression);
 
   @Deprecated('This constructor will be removed in Dart 2.0. Use `implements`'
       ' instead of `extends` if implementing this abstract class.')
-  WebSocket();
+  MyWebSocket();
 
   /**
    * Creates a WebSocket from an already-upgraded socket.
@@ -402,7 +402,7 @@ abstract class WebSocket
    * to negotiate with the specified [CompressionOptions]. If none is specified
    * then the [WebSocket] will be created with the default [CompressionOptions].
    */
-  factory WebSocket.fromUpgradedSocket(Socket socket,
+  factory MyWebSocket.fromUpgradedSocket(Socket socket,
       {String? protocol,
       bool? serverSide,
       CompressionOptions compression = CompressionOptions.compressionDefault}) {
@@ -410,7 +410,7 @@ abstract class WebSocket
       throw new ArgumentError("The serverSide argument must be passed "
           "explicitly to WebSocket.fromUpgradedSocket.");
     }
-    return new _WebSocketImpl._fromSocket(
+    return new _MyWebSocketImpl._fromSocket(
         socket, protocol, compression, serverSide);
   }
 
@@ -478,13 +478,13 @@ abstract class WebSocket
   /**
    * Gets the user agent used for WebSocket connections.
    */
-  static String? get userAgent => _WebSocketImpl.userAgent;
+  static String? get userAgent => _MyWebSocketImpl.userAgent;
 
   /**
    * Sets the user agent to use for WebSocket connections.
    */
   static set userAgent(String? userAgent) {
-    _WebSocketImpl.userAgent = userAgent;
+    _MyWebSocketImpl.userAgent = userAgent;
   }
 }
 

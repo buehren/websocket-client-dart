@@ -410,19 +410,19 @@ class _WebSocketPong {
 typedef /*String|Future<String>*/ _ProtocolSelector(List<String> protocols);
 
 class _WebSocketTransformerImpl
-    extends StreamTransformerBase<HttpRequest, WebSocket>
+    extends StreamTransformerBase<HttpRequest, MyWebSocket>
     implements WebSocketTransformer {
-  final StreamController<WebSocket> _controller =
-      new StreamController<WebSocket>(sync: true);
+  final StreamController<MyWebSocket> _controller =
+      new StreamController<MyWebSocket>(sync: true);
   final _ProtocolSelector? _protocolSelector;
   final CompressionOptions _compression;
 
   _WebSocketTransformerImpl(this._protocolSelector, this._compression);
 
-  Stream<WebSocket> bind(Stream<HttpRequest> stream) {
+  Stream<MyWebSocket> bind(Stream<HttpRequest> stream) {
     stream.listen((request) {
       _upgrade(request, _protocolSelector, _compression)
-          .then((WebSocket webSocket) => _controller.add(webSocket))
+          .then((MyWebSocket webSocket) => _controller.add(webSocket))
           .catchError(_controller.addError);
     }, onDone: () {
       _controller.close();
@@ -448,7 +448,7 @@ class _WebSocketTransformerImpl
     return tokens;
   }
 
-  static Future<WebSocket> _upgrade(HttpRequest request,
+  static Future<MyWebSocket> _upgrade(HttpRequest request,
       _ProtocolSelector? protocolSelector, CompressionOptions compression) {
     var response = request.response;
     if (!_isUpgradeRequest(request)) {
@@ -460,7 +460,7 @@ class _WebSocketTransformerImpl
           new WebSocketException("Invalid WebSocket upgrade request"));
     }
 
-    Future<WebSocket> upgrade(String? protocol) {
+    Future<MyWebSocket> upgrade(String? protocol) {
       // Send the upgrade response.
       response
         ..statusCode = HttpStatus.switchingProtocols
@@ -478,8 +478,8 @@ class _WebSocketTransformerImpl
       var deflate = _negotiateCompression(request, response, compression);
 
       response.headers.contentLength = 0;
-      return response.detachSocket().then<WebSocket>((socket) =>
-          new _WebSocketImpl._fromSocket(
+      return response.detachSocket().then<MyWebSocket>((socket) =>
+          new _MyWebSocketImpl._fromSocket(
               socket, protocol, compression, true, deflate));
     }
 
@@ -501,7 +501,7 @@ class _WebSocketTransformerImpl
           ..statusCode = HttpStatus.internalServerError
           ..close();
         throw error;
-      }).then<WebSocket>(upgrade);
+      }).then<MyWebSocket>(upgrade);
     } else {
       return upgrade(null);
     }
@@ -514,7 +514,7 @@ class _WebSocketTransformerImpl
     extensionHeader ??= "";
 
     var hv = HeaderValue.parse(extensionHeader, valueSeparator: ',');
-    if (compression.enabled && hv.value == _WebSocketImpl.PER_MESSAGE_DEFLATE) {
+    if (compression.enabled && hv.value == _MyWebSocketImpl.PER_MESSAGE_DEFLATE) {
       var info = compression._createHeader(hv);
 
       response.headers.add("Sec-WebSocket-Extensions", info.headerValue);
@@ -580,8 +580,8 @@ class _WebSocketPerMessageDeflate {
   RawZLibFilter? encoder;
 
   _WebSocketPerMessageDeflate(
-      {this.clientMaxWindowBits = _WebSocketImpl.DEFAULT_WINDOW_BITS,
-      this.serverMaxWindowBits = _WebSocketImpl.DEFAULT_WINDOW_BITS,
+      {this.clientMaxWindowBits = _MyWebSocketImpl.DEFAULT_WINDOW_BITS,
+      this.serverMaxWindowBits = _MyWebSocketImpl.DEFAULT_WINDOW_BITS,
       this.serverNoContextTakeover = false,
       this.clientNoContextTakeover = false,
       this.serverSide = false});
@@ -669,7 +669,7 @@ class _WebSocketPerMessageDeflate {
 // TODO(ajohnsen): Make this transformer reusable.
 class _WebSocketOutgoingTransformer
     extends StreamTransformerBase<dynamic, List<int>> implements EventSink {
-  final _WebSocketImpl webSocket;
+  final _MyWebSocketImpl webSocket;
   EventSink<List<int>>? _eventSink;
 
   _WebSocketPerMessageDeflate? _deflateHelper;
@@ -848,13 +848,13 @@ class _WebSocketOutgoingTransformer
 }
 
 class _WebSocketConsumer implements StreamConsumer {
-  final _WebSocketImpl webSocket;
+  final _MyWebSocketImpl webSocket;
   final Socket socket;
   StreamController? _controller;
   StreamSubscription? _subscription;
   bool _issuedPause = false;
   bool _closed = false;
-  Completer _closeCompleter = new Completer<WebSocket>();
+  Completer _closeCompleter = new Completer<MyWebSocket>();
   Completer? _completer;
 
   _WebSocketConsumer(this.webSocket, this.socket);
@@ -969,9 +969,9 @@ class _WebSocketConsumer implements StreamConsumer {
   }
 }
 
-class _WebSocketImpl extends Stream with _ServiceObject implements WebSocket {
+class _MyWebSocketImpl extends Stream with _ServiceObject implements MyWebSocket {
   // Use default Map so we keep order.
-  static Map<int, _WebSocketImpl> _webSockets = new Map<int, _WebSocketImpl>();
+  static Map<int, _MyWebSocketImpl> _webSockets = new Map<int, _MyWebSocketImpl>();
   static const int DEFAULT_WINDOW_BITS = 15;
   static const String PER_MESSAGE_DEFLATE = "permessage-deflate";
 
@@ -983,7 +983,7 @@ class _WebSocketImpl extends Stream with _ServiceObject implements WebSocket {
 
   final Socket _socket;
   final bool _serverSide;
-  int _readyState = WebSocket.connecting;
+  int _readyState = MyWebSocket.connecting;
   bool _writeClosed = false;
   int? _closeCode;
   String? _closeReason;
@@ -998,7 +998,7 @@ class _WebSocketImpl extends Stream with _ServiceObject implements WebSocket {
 
   static final HttpClient _httpClient = new HttpClient();
 
-  static Future<WebSocket> connect(
+  static Future<MyWebSocket> connect(
       String url, Iterable<String>? protocols, Map<String, dynamic>? headers,
       {CompressionOptions compression =
           CompressionOptions.compressionDefault}) {
@@ -1089,8 +1089,8 @@ class _WebSocketImpl extends Stream with _ServiceObject implements WebSocket {
       _WebSocketPerMessageDeflate? deflate =
           negotiateClientCompression(response, compression);
 
-      return response.detachSocket().then<WebSocket>((socket) =>
-          new _WebSocketImpl._fromSocket(
+      return response.detachSocket().then<MyWebSocket>((socket) =>
+          new _MyWebSocketImpl._fromSocket(
               socket, protocol, compression, false, deflate));
     });
   }
@@ -1127,13 +1127,13 @@ class _WebSocketImpl extends Stream with _ServiceObject implements WebSocket {
     return null;
   }
 
-  _WebSocketImpl._fromSocket(
+  _MyWebSocketImpl._fromSocket(
       this._socket, this.protocol, CompressionOptions compression,
       [this._serverSide = false, _WebSocketPerMessageDeflate? deflate])
       : _controller = new StreamController(sync: true) {
     _consumer = new _WebSocketConsumer(this, _socket);
     _sink = new _StreamSinkImpl(_consumer);
-    _readyState = WebSocket.open;
+    _readyState = MyWebSocket.open;
     _deflate = deflate;
 
     var transformer = new _WebSocketProtocolTransformer(_serverSide, deflate);
@@ -1159,14 +1159,14 @@ class _WebSocketImpl extends Stream with _ServiceObject implements WebSocket {
       _controller.close();
     }, onDone: () {
       _closeTimer?.cancel();
-      if (_readyState == WebSocket.open) {
-        _readyState = WebSocket.closing;
+      if (_readyState == MyWebSocket.open) {
+        _readyState = MyWebSocket.closing;
         if (!_isReservedStatusCode(transformer.closeCode)) {
           _close(transformer.closeCode, transformer.closeReason);
         } else {
           _close();
         }
-        _readyState = WebSocket.closed;
+        _readyState = MyWebSocket.closed;
       }
       // Protocol close, use close code from transformer.
       _closeCode = transformer.closeCode;
