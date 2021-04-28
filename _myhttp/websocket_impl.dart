@@ -1050,6 +1050,12 @@ class _MyWebSocketImpl extends Stream with _ServiceObject implements MyWebSocket
             .add("Sec-WebSocket-Extensions", compression._createHeader());
       }
 
+      // Remove header "content-length". It is automatically set to 0 for GET requests.
+      // But there are servers that terminate the connection when sending
+      // data even after the Websocket upgrade (e.g. Google Cloud Run).
+      // https://github.com/dart-lang/sdk/issues/45139
+      request.headers.removeAll(HttpHeaders.contentLengthHeader);
+
       return request.close();
     }).then((response) {
       Never error(String message) {
