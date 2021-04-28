@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:async';
 import 'package:args/args.dart';
 
-/*late*/ WebSocket _webSocket;
+late MyWebSocket _webSocket;
 const urlParamName = 'url';
 
 void main(List<String> arguments) {
